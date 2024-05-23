@@ -50,6 +50,34 @@ class TransactionRepository extends ServiceEntityRepository
         return (float) $qb->getSingleScalarResult();
     }
 
+    public function findByCurrency($currency)
+    {
+        if ($currency === 'CLP' || $currency === 'USD') {
+            return $this->createQueryBuilder('t')
+                ->andWhere('t.currency = :currency')
+                ->setParameter('currency', $currency)
+                ->getQuery()
+                ->getResult();
+        }
+
+        return $this->findAll();
+    }
+    
+    public function calculateTotalBalance($currency)
+    {
+        $transactions = $this->findByCurrency($currency);
+        $totalBalance = 0;
+        if(!is_null($currency)){
+            foreach ($transactions as $transaction) {
+                if ($transaction->getType() === 'income') {
+                    $totalBalance += $transaction->getAmount();
+                } else {
+                    $totalBalance -= $transaction->getAmount();
+                }
+            }
+        }
+        return $totalBalance;
+    }
 //    /**
 //     * @return Transaction[] Returns an array of Transaction objects
 //     */

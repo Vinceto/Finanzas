@@ -32,6 +32,11 @@ class Transaction
      */
     private $date;
 
+    /**
+     * @ORM\Column(type="string", length=3)
+     */
+    private $currency;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -69,6 +74,18 @@ class Transaction
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getCurrency(): ?string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(string $currency): self
+    {
+        $this->currency = $currency;
 
         return $this;
     }
