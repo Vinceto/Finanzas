@@ -39,6 +39,17 @@ class TransactionRepository extends ServiceEntityRepository
         }
     }
 
+    public function calculateTotalByType(string $type): float
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('SUM(t.amount)')
+            ->where('t.type = :type')
+            ->setParameter('type', $type)
+            ->getQuery();
+
+        return (float) $qb->getSingleScalarResult();
+    }
+
 //    /**
 //     * @return Transaction[] Returns an array of Transaction objects
 //     */
