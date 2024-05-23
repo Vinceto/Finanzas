@@ -6,6 +6,7 @@ use App\Entity\Transaction;
 use App\Form\TransactionType;
 use App\Repository\TransactionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,13 +21,21 @@ class TransactionController extends AbstractController
         $this->entityManager = $entityManager;
         $this->transactionRepository = $transactionRepository;
     }
-
-    public function index(): Response
+    
+    public function index(Request $request, PaginatorInterface $paginator): Response
     {
-        $transactions = $this->transactionRepository->findAll();
-        $totalIncome = $this->transactionRepository->calculateTotalByType('income');
-        $totalExpense = $this->transactionRepository->calculateTotalByType('expense');
-        $totalBalance = $totalIncome - $totalExpense;
+        $currency = $request->query->get('currency');
+        $transactions = $this->transactionRepository->findByCurrency($currency);
+        
+        // Paginación
+        $transactions = $paginator->paginate(
+            $transactions, // Query sin ejecutar
+            $request->query->getInt('page', 1), // Número de página
+            10 // Cantidad de elementos por página
+        );
+        // dump($transactions);
+        // die;
+        $totalBalance = $this->transactionRepository->calculateTotalBalance($currency);
 
         return $this->render('transaction/index.html.twig', [
             'transactions' => $transactions,
@@ -41,8 +50,7 @@ class TransactionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->persist($transaction);
-            $this->entityManager->flush();
+            $this->transactionRepository->add($transaction, true);
 
             return $this->redirectToRoute('transaction_index');
         }
@@ -53,4 +61,3 @@ class TransactionController extends AbstractController
         ]);
     }
 }
-

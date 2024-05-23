@@ -5,6 +5,15 @@
 {% block body %}
     <h1>Transacciones</h1>
 
+    <div class="mb-3">
+        <label for="currencyFilter" class="form-label"><i class="bi bi-cash-coin"></i> Filtrar por Moneda:</label>
+        <select id="currencyFilter" class="form-select" onchange="location = this.value;">
+            <option value="{{ path('transaction_index') }}" {% if not app.request.query.has('currency') %}selected{% endif %}>Todas</option>
+            <option value="{{ path('transaction_index', {'currency': 'CLP'}) }}" {% if app.request.query.get('currency') == 'CLP' %}selected{% endif %}>CLP</option>
+            <option value="{{ path('transaction_index', {'currency': 'USD'}) }}" {% if app.request.query.get('currency') == 'USD' %}selected{% endif %}>USD</option>
+        </select>
+    </div>
+
     <table class="table">
         <thead>
             <tr>
@@ -19,14 +28,45 @@
                 <tr>
                     <td>{{ transaction.id }}</td>
                     <td>{{ transaction.type }}</td>
-                    <td>{{ transaction.amount }}</td>
+                    <td>{{ transaction.amount }} ({{ transaction.currency }})</td>
                     <td>{{ transaction.date|date('Y-m-d') }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 
+    {% if transactions.getTotalItemCount() > transactions.getItemNumberPerPage() %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if transactions.getCurrentPageNumber() != 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': 1})) }}">Primera</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': transactions.getCurrentPageNumber() - 1})) }}">Anterior</a>
+                    </li>
+                {% endif %}
+                {% for page in range(1, transactions.getPaginationData().pageCount) %}
+                    {% if page == transactions.getCurrentPageNumber() %}
+                        <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': page})) }}">{{ page }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if transactions.getCurrentPageNumber() != transactions.getPaginationData().pageCount %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': transactions.getCurrentPageNumber() + 1})) }}">Siguiente</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': transactions.getPaginationData().pageCount})) }}">Última</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+    
     <div class="alert alert-info">
-        <strong>Balance Total:</strong> {{ total_balance }}
+        <strong><i class="bi bi-wallet2"></i> Balance Total:</strong> {{ total_balance }}
     </div>
+    
 {% endblock %}
