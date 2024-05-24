@@ -62,11 +62,9 @@ La aplicación ofrece una interfaz de usuario y una API para gestionar transacci
 
 Accede a la aplicación en tu navegador web:
 
-
 ### API
 
 La API ofrece endpoints para listar, crear, editar y eliminar transacciones. Puedes encontrar la documentación de la API en:
-
 
 ## Contribución
 
@@ -81,3 +79,18 @@ Si deseas contribuir a este proyecto, sigue estos pasos:
 ## Licencia
 
 Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+
+## Configuración utilizada
+
+- PHP 7.4.26 (cli)
+- Symfony CLI version 5.8.17
+- psql (PostgreSQL) 16.2
+
+## Editor de Texto
+
+- Visual Studio Code
+
+## Extensiones de VS Code
+
+- Twig v1.0.2
+- Live Server v5.7.9
