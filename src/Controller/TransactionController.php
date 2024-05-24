@@ -26,21 +26,55 @@ class TransactionController extends AbstractController
     
     public function index(Request $request, PaginatorInterface $paginator): Response
     {
-        $currency = $request->query->get('currency');
-        $transactions = $this->transactionRepository->findByCurrency($currency);
+        $currency = $request->get('currency') ?: null;
+        $month = $request->get('month') ?: date('m');
+        $year = $request->get('year') ?: date('Y');
+
+        // Obtener todos los años disponibles para el filtro de año
+        $allYears = $this->transactionRepository->findUniqueYears();
+
+        // Definir los nombres de los meses en español
+        $spanishMonths = [
+            0 => 'Seleccione un Mes',
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 5 => 'Mayo', 6 => 'Junio',
+            7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+        ];
+
+        // Crear el arreglo de meses solo si el año es igual al año actual, de lo contrario, mostrar solo diciembre
+        $currentYear = date('Y');
+        $currentMonth = date('m');
+        $allMonths = [];
+        $hasta = ($year == $currentYear) ? $currentMonth : 12;
+        for ($i = 0; $i <= $hasta; $i++) {
+            $monthName = $spanishMonths[$i];
+            $allMonths[] = [
+                'month' => $i,
+                'monthName' => $monthName
+            ];
+        }
+
+        // Obtener las transacciones filtradas
+        $transactions = $this->transactionRepository->findByMonthAndYearAndCurrency($month, $year, $currency);
         
-        // Paginación
+        // Paginar las transacciones
         $transactions = $paginator->paginate(
             $transactions, // Query sin ejecutar
             $request->query->getInt('page', 1), // Número de página
             10 // Cantidad de elementos por página
         );
 
-        $totalBalance = $this->transactionRepository->calculateTotalBalance($currency);
+        // Calcular el balance total
+        $totalBalance = $this->transactionRepository->calculateTotalBalanceByMonthYearAndCurrency($month, $year, $currency);
         
+        // Renderizar la vista con los datos
         return $this->render('transaction/index.html.twig', [
             'transactions' => $transactions,
-            'total_balance' => $totalBalance
+            'total_balance' => $totalBalance,
+            'all_years' => $allYears,
+            'all_months' => $allMonths,
+            'year' => $year,
+            'month' => $month,
+            'currency' => $currency,
         ]);
     }
 
@@ -104,5 +138,5 @@ class TransactionController extends AbstractController
         $entityManager->flush();
 
         return $this->redirectToRoute('transaction_index');
-    }
+    }    
 }

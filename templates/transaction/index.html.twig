@@ -4,34 +4,57 @@
 
 {% block body %}
     <h1>Transacciones</h1>
-
-    <div class="mb-3">
-        <label for="currencyFilter" class="form-label"><i class="bi bi-cash-coin"></i> Filtrar por Moneda:</label>
-        <select id="currencyFilter" class="form-select" onchange="location = this.value;">
-            <option value="{{ path('transaction_index') }}" {% if not app.request.query.has('currency') %}selected{% endif %}>Todas</option>
-            <option value="{{ path('transaction_index', {'currency': 'CLP'}) }}" {% if app.request.query.get('currency') == 'CLP' %}selected{% endif %}>CLP</option>
-            <option value="{{ path('transaction_index', {'currency': 'USD'}) }}" {% if app.request.query.get('currency') == 'USD' %}selected{% endif %}>USD</option>
-        </select>
+    <div class="row mb-3">
+        <div class="col-4">
+            <label for="currencyFilter" class="form-label"><i class="bi bi-cash-coin"></i> Filtrar por Moneda:</label>
+            <select id="currencyFilter" class="form-select">
+                <option value="0" {% if not currency %}selected{% endif %}>Todas</option>
+                <option value="CLP" {% if currency == 'CLP' %}selected{% endif %}>CLP</option>
+                <option value="USD" {% if currency == 'USD' %}selected{% endif %}>USD</option>
+            </select>
+        </div>
+        <div class="col-4">
+            <label for="yearFilter" class="form-label"><i class="bi bi-calendar"></i> Filtrar por Año:</label>
+            <select id="yearFilter" class="form-select" onchange="populateMonthFilter();">
+                {% for yearData in all_years %}
+                    <option value="{{ yearData.year }}" {% if year == yearData.year %}selected{% endif %}>{{ yearData.year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-4">
+            <label for="monthFilter" class="form-label"><i class="bi bi-calendar"></i> Filtrar por Mes:</label>
+            <select id="monthFilter" class="form-select" >
+                {% for monthData in all_months %}
+                    {# {% set month = monthData.month %}
+                    {% set monthName = monthData.monthName %} #}
+                    <option value="{{ monthData.month }}" {% if month == monthData.month %}selected{% endif %}>{{ monthData.monthName }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-12 text-end">
+            <label class="invisible">Buscar</label>
+            <button class="btn btn-primary" onclick="applyFilters()">Buscar</button>
+        </div>
     </div>
 
     <table class="table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Tipo</th>
-                <th>Monto</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
+                {# <th class="col">ID</th> #}
+                <th class="col-3">Tipo</th>
+                <th class="col-3">Monto</th>
+                <th class="col-3">Fecha</th>
+                <th class="col-3 text-end">Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for transaction in transactions %}
                 <tr>
-                    <td>{{ transaction.id }}</td>
-                    <td>{{ transaction.type }}</td>
-                    <td>{{ transaction.amount }} ({{ transaction.currency }})</td>
-                    <td>{{ transaction.date|date('d-m-Y') }}</td>
-                    <td>
+                    {# <td class="col-3">{{ transaction.id }}</td> #}
+                    <td class="col-3">{{ transaction.type }}</td>
+                    <td class="col-3">{{ transaction.amount }} ({{ transaction.currency }})</td>
+                    <td class="col-3">{{ transaction.date|date('d-m-Y') }}</td>
+                    <td class="col-3 text-end">
                         <a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary"><i class="bi bi-pencil-fill"></i> Editar</a>
                         <a href="#" class="btn btn-danger ms-2 delete-transaction-button" data-transaction-id="{{ transaction.id }}" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"><i class="bi bi-trash-fill"></i> Eliminar</a>
                     </td>
@@ -129,5 +152,70 @@
                 xhr.send();
             });
         });
+
+        // Función para poblar el filtro de meses
+        function populateMonthFilter() {
+            var year = document.getElementById('yearFilter').value;
+            var monthFilter = document.getElementById('monthFilter');
+                        
+            // Clear existing options
+            monthFilter.innerHTML = '';
+
+            // Define los nombres de los meses en español
+            var spanishMonths = ["Seleccione un Mes", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+            // Determina el máximo mes basado en el año seleccionado
+            var currentYear = new Date().getFullYear();
+            var currentMonth = new Date().getMonth() + 1; // Sumamos 1 porque los meses se indexan desde 0
+
+            var maxMonth = 12; // Por defecto, mostramos todos los meses (hasta diciembre)
+
+            if (year == currentYear) {
+                maxMonth = currentMonth; // Si es el año actual, mostramos solo hasta el mes actual
+            }
+                        
+            // Populate months up to the maximum month
+            for (var i = 0; i <= maxMonth; i++) {
+                var option = document.createElement('option');
+                option.text = spanishMonths[i];
+                option.value = i === 0 ? '' : i;
+                monthFilter.appendChild(option);
+            }
+        }
+
+        function applyFilters() {
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ path('transaction_index') }}';
+
+            var currency = document.getElementById('currencyFilter').value;
+            var year = document.getElementById('yearFilter').value;
+            var month = document.getElementById('monthFilter').value;
+            
+            // Crear input para cada parámetro del filtro
+            var inputCurrency = document.createElement('input');
+            inputCurrency.type = 'hidden';
+            inputCurrency.name = 'currency';
+            inputCurrency.value = currency;
+
+            var inputYear = document.createElement('input');
+            inputYear.type = 'hidden';
+            inputYear.name = 'year';
+            inputYear.value = year;
+
+            var inputMonth = document.createElement('input');
+            inputMonth.type = 'hidden';
+            inputMonth.name = 'month';
+            inputMonth.value = month;
+
+            // Agregar inputs al formulario
+            form.appendChild(inputCurrency);
+            form.appendChild(inputYear);
+            form.appendChild(inputMonth);
+
+            // Agregar formulario al body y enviarlo
+            document.body.appendChild(form);
+            form.submit();
+        }
     </script>
 {% endblock %}
