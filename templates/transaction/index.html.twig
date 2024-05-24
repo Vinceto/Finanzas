@@ -21,6 +21,7 @@
                 <th>Tipo</th>
                 <th>Monto</th>
                 <th>Fecha</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -29,7 +30,11 @@
                     <td>{{ transaction.id }}</td>
                     <td>{{ transaction.type }}</td>
                     <td>{{ transaction.amount }} ({{ transaction.currency }})</td>
-                    <td>{{ transaction.date|date('Y-m-d') }}</td>
+                    <td>{{ transaction.date|date('d-m-Y') }}</td>
+                    <td>
+                        <a href="{{ path('transaction_edit', {'id': transaction.id}) }}" class="btn btn-primary"><i class="bi bi-pencil-fill"></i> Editar</a>
+                        <a href="#" class="btn btn-danger ms-2 delete-transaction-button" data-transaction-id="{{ transaction.id }}" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"><i class="bi bi-trash-fill"></i> Eliminar</a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -69,4 +74,60 @@
         <strong><i class="bi bi-wallet2"></i> Balance Total:</strong> {{ total_balance }}
     </div>
     
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar esta transacción?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmDeleteButton" class="btn btn-danger">Eliminar</button>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+            var confirmDeleteButton = document.getElementById('confirmDeleteButton');
+            var transactionIdToDelete;
+
+            document.querySelectorAll('.delete-transaction-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    transactionIdToDelete = button.getAttribute('data-transaction-id');
+                });
+            });
+
+            confirmDeleteButton.addEventListener('click', function() {
+                if (!transactionIdToDelete) {
+                    console.error('No se pudo obtener el ID de la transacción a eliminar.');
+                    return;
+                }
+
+                var url = "{{ path('transaction_delete', {'id': 'PLACEHOLDER_ID'}) }}";
+                url = url.replace('PLACEHOLDER_ID', transactionIdToDelete);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('DELETE', url, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        location.reload(); // Recargar la página
+                    } else {
+                        console.error('Error al eliminar la transacción:', xhr.statusText);
+                    }
+                };
+                xhr.send();
+            });
+        });
+    </script>
 {% endblock %}

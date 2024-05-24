@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class TransactionType extends AbstractType
 {
@@ -33,8 +34,17 @@ class TransactionType extends AbstractType
                 'label' => 'Currency'
             ])
             ->add('amount', MoneyType::class, [
-                'currency' => 'USD', // Default currency
-                'label' => 'Amount'
+                'currency' => 'USD',
+                'label' => 'Amount',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => 'El monto no puede estar vacío',
+                    ]),
+                    new Assert\LessThanOrEqual([
+                        'value' => 99999999.99, 
+                        'message' => 'El monto debe ser menor o igual a 99,999,999.99 USD',
+                    ]),
+                ],
             ])
             ->add('date', DateType::class, [
                 'widget' => 'single_text',

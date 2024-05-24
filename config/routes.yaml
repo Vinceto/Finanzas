@@ -9,3 +9,13 @@ transaction_index:
 transaction_new:
     path: /transactions/new
     controller: App\Controller\TransactionController::new
+
+transaction_edit:
+    path: /transactions/{id}/edit
+    controller: App\Controller\TransactionController::edit
+    methods: ['GET', 'POST']
+
+transaction_delete:
+    path: /transactions/{id}/delete
+    controller: App\Controller\TransactionController::delete
+    methods: ['DELETE']

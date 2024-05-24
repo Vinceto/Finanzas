@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Transaction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<Transaction>
@@ -32,7 +33,7 @@ class TransactionRepository extends ServiceEntityRepository
 
     public function remove(Transaction $entity, bool $flush = false): void
     {
-        $this->getEntityManager()->remove($entity);
+        $entity->setDeletedAt(new \DateTime());
 
         if ($flush) {
             $this->getEntityManager()->flush();
@@ -44,6 +45,7 @@ class TransactionRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('t')
             ->select('SUM(t.amount)')
             ->where('t.type = :type')
+            ->andWhere('t.deletedAt IS NULL')
             ->setParameter('type', $type)
             ->getQuery();
 
@@ -52,15 +54,15 @@ class TransactionRepository extends ServiceEntityRepository
 
     public function findByCurrency($currency)
     {
+        $qb = $this->createQueryBuilder('t')
+            ->andWhere('t.deletedAt IS NULL');
+
         if ($currency === 'CLP' || $currency === 'USD') {
-            return $this->createQueryBuilder('t')
-                ->andWhere('t.currency = :currency')
-                ->setParameter('currency', $currency)
-                ->getQuery()
-                ->getResult();
+            $qb->andWhere('t.currency = :currency')
+               ->setParameter('currency', $currency);
         }
 
-        return $this->findAll();
+        return $qb->getQuery()->getResult();
     }
     
     public function calculateTotalBalance($currency)
@@ -78,28 +80,5 @@ class TransactionRepository extends ServiceEntityRepository
         }
         return $totalBalance;
     }
-//    /**
-//     * @return Transaction[] Returns an array of Transaction objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('t.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Transaction
-//    {
-//        return $this->createQueryBuilder('t')
-//            ->andWhere('t.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    
 }

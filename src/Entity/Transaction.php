@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TransactionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=TransactionRepository::class)
@@ -24,6 +25,11 @@ class Transaction
 
     /**
      * @ORM\Column(type="decimal", precision=10, scale=2)
+     * @Assert\NotBlank(message="El monto no puede estar vacío")
+     * @Assert\LessThanOrEqual(
+     *     value = 99999999.99,
+     *     message = "El monto debe ser menor o igual a 99,999,999.99"
+     * )
      */
     private $amount;
 
@@ -36,6 +42,11 @@ class Transaction
      * @ORM\Column(type="string", length=3)
      */
     private $currency;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $deletedAt;
 
     public function getId(): ?int
     {
@@ -86,6 +97,18 @@ class Transaction
     public function setCurrency(string $currency): self
     {
         $this->currency = $currency;
+
+        return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeInterface
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeInterface $deletedAt): self
+    {
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }
