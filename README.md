@@ -53,7 +53,7 @@ Este proyecto es una aplicación de Symfony para gestionar transacciones financi
     ```bash
     symfony server:start
     ```
-
+    podras acceder desde: local: http://127.0.0.1:8000/transactions
 ## Uso
 
 La aplicación ofrece una interfaz de usuario y una API para gestionar transacciones financieras.
