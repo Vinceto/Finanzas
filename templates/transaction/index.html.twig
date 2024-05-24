@@ -25,22 +25,19 @@
             <label for="monthFilter" class="form-label"><i class="bi bi-calendar"></i> Filtrar por Mes:</label>
             <select id="monthFilter" class="form-select" >
                 {% for monthData in all_months %}
-                    {# {% set month = monthData.month %}
-                    {% set monthName = monthData.monthName %} #}
                     <option value="{{ monthData.month }}" {% if month == monthData.month %}selected{% endif %}>{{ monthData.monthName }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="col-12 text-end my-2">
             <label class="invisible">Buscar</label>
-            <button class="btn btn-primary" onclick="applyFilters()">Buscar</button>
+            <button class="btn btn-primary" onclick="applyFilters()"><i class="bi bi-search"></i> Buscar</button>
         </div>
     </div>
 
     <table class="table">
         <thead>
             <tr>
-                {# <th class="col">ID</th> #}
                 <th class="col-3">Tipo</th>
                 <th class="col-3">Monto</th>
                 <th class="col-3">Fecha</th>
@@ -50,7 +47,6 @@
         <tbody>
             {% for transaction in transactions %}
                 <tr>
-                    {# <td class="col-3">{{ transaction.id }}</td> #}
                     <td class="col-3">{{ transaction.type }}</td>
                     <td class="col-3">{{ transaction.amount }} ({{ transaction.currency }})</td>
                     <td class="col-3">{{ transaction.date|date('d-m-Y') }}</td>
@@ -157,8 +153,7 @@
         function populateMonthFilter() {
             var year = document.getElementById('yearFilter').value;
             var monthFilter = document.getElementById('monthFilter');
-                        
-            // Clear existing options
+            
             monthFilter.innerHTML = '';
 
             // Define los nombres de los meses en español
@@ -166,15 +161,14 @@
 
             // Determina el máximo mes basado en el año seleccionado
             var currentYear = new Date().getFullYear();
-            var currentMonth = new Date().getMonth() + 1; // Sumamos 1 porque los meses se indexan desde 0
+            var currentMonth = new Date().getMonth() + 1;
 
-            var maxMonth = 12; // Por defecto, mostramos todos los meses (hasta diciembre)
+            var maxMonth = 12; // Por defecto se muestran todos los meses (hasta diciembre)
 
             if (year == currentYear) {
                 maxMonth = currentMonth; // Si es el año actual, mostramos solo hasta el mes actual
             }
-                        
-            // Populate months up to the maximum month
+            
             for (var i = 0; i <= maxMonth; i++) {
                 var option = document.createElement('option');
                 option.text = spanishMonths[i];

@@ -66,7 +66,7 @@ class TransactionController extends AbstractController
         // Calcular el balance total
         $totalBalance = $this->transactionRepository->calculateTotalBalanceByMonthYearAndCurrency($month, $year, $currency);
         
-        // Renderizar la vista con los datos
+        
         return $this->render('transaction/index.html.twig', [
             'transactions' => $transactions,
             'total_balance' => $totalBalance,
