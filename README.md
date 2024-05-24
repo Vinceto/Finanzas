@@ -6,7 +6,7 @@ Este proyecto es una aplicación de Symfony para gestionar transacciones financi
 
 - PHP >= 7.4
 - Composer
-- MySQL o cualquier otra base de datos compatible con Doctrine
+- PostgreSQL
 
 ## Instalación
 
@@ -51,7 +51,7 @@ Este proyecto es una aplicación de Symfony para gestionar transacciones financi
 7. Inicia el servidor local:
 
     ```bash
-    symfony serve
+    symfony server:start
     ```
 
 ## Uso
