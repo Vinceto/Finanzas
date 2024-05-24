@@ -19,3 +19,27 @@ transaction_delete:
     path: /transactions/{id}/delete
     controller: App\Controller\TransactionController::delete
     methods: ['DELETE']
+
+api_doc:
+    path: /api/doc
+    controller: nelmio_api_doc.controller.swagger_ui
+    
+api_transactions_index:
+    path: /api/transactions
+    controller: App\Controller\ApiTransactionController::index
+    methods: GET
+
+api_transactions_new:
+    path: /api/transactions/new
+    controller: App\Controller\ApiTransactionController::new
+    methods: POST
+
+api_transactions_edit:
+    path: /api/transactions/{id}/edit
+    controller: App\Controller\ApiTransactionController::edit
+    methods: PUT
+
+api_transactions_delete:
+    path: /api/transactions/{id}/delete
+    controller: App\Controller\ApiTransactionController::delete
+    methods: DELETE
