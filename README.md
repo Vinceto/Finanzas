@@ -6,54 +6,141 @@ Este proyecto es una aplicación de Symfony para gestionar transacciones financi
 
 - PHP >= 7.4
 - Composer
-- PostgreSQL
+- PostgreSQL 16.2
+- Symfony CLI version 5.8.17
 
-## Instalación
-
+# Instalación desde Windows
 1. Clona el repositorio:
 
     ```bash
-    git clone https://github.com/tu_usuario/transacciones.git
+    git clone git@github.com:Vinceto/finanzas.git
     ```
 
 2. Accede al directorio del proyecto:
 
     ```bash
-    cd transacciones
+    cd finanzas
     ```
 
-3. Instala las dependencias con Composer:
+3. Descargar PHP 7.4.26:
+
+    ```bash
+    https://phpdev.toolsforresearch.com/php-7.4.33-nts-Win32-vs16-x64.zip
+    ```
+
+4. Descomprime y crea la variable de entorno en Path con esta ruta y dentro de 7.4 descomprime el zip:
+
+    ```bash
+    C:\php\7.4
+    ```
+
+5. Probar si funciona:
+
+    ```bash
+    php -v
+    ```
+# te retornara un mensaje
+PHP 7.4.33 (cli) (built: May 22 2024 13:42:34) ( NTS Visual C++ 2019 x64 )
+
+6. Descargar y ejecutar .exe composer:
+
+    ```bash
+    https://getcomposer.org/download/
+    ```
+
+7. Probar si funciona:
+
+    ```bash
+    composer -v
+    ```
+# te retornara un mensaje
+   ______
+  / ____/___  ____ ___  ____  ____  ________  _____
+ / /   / __ \/ __ `__ \/ __ \/ __ \/ ___/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ (__  )  __/ /    
+\____/\____/_/ /_/ /_/ .___/\____/____/\___/_/     
+                    /_/
+Composer version 2.7.6 2024-05-04 23:03:15
+
+8. Instalar las dependencias de Composer:
 
     ```bash
     composer install
     ```
 
-4. Copia el archivo `.env`:
+9. Descargar e instalar postgresql:
 
     ```bash
-    cp .env.example .env
+    https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
     ```
 
-5. Configura tu base de datos en el archivo `.env`:
+10. Probar instalacion:
 
-    ```dotenv
-    # Configura la conexión a la base de datos
-    DATABASE_URL=mysql://usuario:contraseña@127.0.0.1:3306/transacciones
+    ```bash
+    psql -v
     ```
 
-6. Crea la base de datos y ejecuta las migraciones:
+11. Entrar con usuario postgres si desea usar la consola:
+
+    ```bash
+    psql -U postgres
+    ```
+12. Descargar e instalar symfony:
+
+    ```bash
+    https://symfony.com/download
+    ```
+
+13. Cambiar la Política de Ejecución de powershell:
+
+    ```bash
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+
+14. Instalar scoop:
+
+    ```bash
+    iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+    ```
+
+15. Instalar cliente symfony:
+
+    ```bash
+    scoop install symfony-cli
+    ```
+
+16. Probar instalacion:
+
+    ```bash
+    symfony -v
+    ```
+
+17. Ver ubicacion del php.ini y habilitar la extension ;extension=pdo_pgsql quitando el ';' :
+
+    ```bash
+    php --ini
+    ```
+
+18. Crear base de datos:
 
     ```bash
     php bin/console doctrine:database:create
+    ```
+
+19. Crear la migracion para crear las tablas y sus atributos:
+
+    ```bash
     php bin/console doctrine:migrations:migrate
     ```
 
-7. Inicia el servidor local:
+20. Ahora se puede ejecutar el servidor de la app y probarlo con:
 
     ```bash
     symfony server:start
     ```
-    podras acceder desde: local: http://127.0.0.1:8000/transactions
+
+## podras acceder desde local: http://127.0.0.1:8000/transactions
+
 ## Uso
 
 La aplicación ofrece una interfaz de usuario y una API para gestionar transacciones financieras.
@@ -79,12 +166,6 @@ Si deseas contribuir a este proyecto, sigue estos pasos:
 ## Licencia
 
 Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
-
-## Configuración utilizada
-
-- PHP 7.4.26 (cli)
-- Symfony CLI version 5.8.17
-- psql (PostgreSQL) 16.2
 
 ## Editor de Texto
 
